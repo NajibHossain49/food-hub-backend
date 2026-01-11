@@ -2,13 +2,12 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application } from "express";
-
 import config from "./config/env.config.js";
 import homeRoutes from "./modules/home/home.route.js";
-
 // Better Auth imports
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
+import { requireAuth } from "./middlewares/auth.middleware.js";
 
 // Load environment variables
 dotenv.config();
@@ -31,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 3. My normal routes
-app.use("/api", homeRoutes);
+app.use("/api", requireAuth, homeRoutes);
 
 // Health check test route
 app.get("/", (req, res) => {
