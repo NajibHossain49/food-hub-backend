@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import express, { Application } from "express";
 import config from "./config/env.config.js";
 import homeRoutes from "./modules/home/home.route.js";
+import userRoutes from "./modules/user/user.route.js";
+
 // Better Auth imports
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
@@ -28,6 +30,9 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// User routes (User Module) Public + protected user routes
+app.use("/api/users", userRoutes);
 
 // 3. My normal routes
 app.use("/api", requireAuth, homeRoutes);

@@ -13,20 +13,44 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+}
 model User {
   id            String    @id
   name          String
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  phone         String?            // new optional phone
+  role          Role     @default(CUSTOMER) // new role
+  avatarUrl     String?            // optional avatar URL (if you prefer separate from image)
+  isActive      Boolean  @default(true) // soft-delete / activation flag
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  providerProfile ProviderProfile?
+  providerProfileId String?          // nullable FK for provider profile
 
   @@unique([email])
   @@map("user")
 }
+
+model ProviderProfile {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String   @unique
+  name        String
+  description String?
+  address     String?
+  phone       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 
 model Session {
   id        String   @id
