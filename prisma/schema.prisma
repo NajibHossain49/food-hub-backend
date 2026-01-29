@@ -49,8 +49,31 @@ model ProviderProfile {
   phone       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  meals Meal[]
 }
 
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  meals     Meal[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Meal {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  provider    ProviderProfile @relation(fields: [providerId], references: [id])
+  providerId  String
+  categoryId  String? 
+  category    Category? @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
 model Session {
   id        String   @id

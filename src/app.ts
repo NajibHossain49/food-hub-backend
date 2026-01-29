@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import express, { Application } from "express";
 import config from "./config/env.config.js";
 import homeRoutes from "./modules/home/home.route.js";
+import mealRoutes from "./modules/meal/meal.route.js";
+import providerRoutes from "./modules/provider/provider.route.js";
 import userRoutes from "./modules/user/user.route.js";
 
 // Better Auth imports
@@ -33,6 +35,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // User routes (User Module) Public + protected user routes
 app.use("/api/users", userRoutes);
+
+// Provider routes (Provider Module) Public + protected provider routes
+app.use("/api/provider", providerRoutes);
+
+// Meal routes (Meal Module) Public meal routes
+app.use("/api/meals", mealRoutes);
 
 // 3. My normal routes
 app.use("/api", requireAuth, homeRoutes);
