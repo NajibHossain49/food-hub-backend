@@ -5,7 +5,9 @@ import express, { Application } from "express";
 import config from "./config/env.config.js";
 import homeRoutes from "./modules/home/home.route.js";
 import mealRoutes from "./modules/meal/meal.route.js";
+import orderRoutes from "./modules/order/order.route.js";
 import providerRoutes from "./modules/provider/provider.route.js";
+import reviewRoutes from "./modules/review/review.route.js";
 import userRoutes from "./modules/user/user.route.js";
 
 // Better Auth imports
@@ -41,6 +43,12 @@ app.use("/api/provider", providerRoutes);
 
 // Meal routes (Meal Module) Public meal routes
 app.use("/api/meals", mealRoutes);
+
+// Order routes (Order Module) Protected order routes
+app.use("/api/orders", orderRoutes);
+
+// Review routes (Review Module) Public + protected review routes
+app.use("/api/reviews", reviewRoutes);
 
 // 3. My normal routes
 app.use("/api", requireAuth, homeRoutes);
