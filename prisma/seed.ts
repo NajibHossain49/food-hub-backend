@@ -1,10 +1,10 @@
-import bcrypt from "bcrypt";
+import { hashPassword } from "better-auth/crypto";
 import { prisma } from "../src/lib/prisma.js";
 
 async function main() {
   console.log("🌱 Starting production seed for FoodHub...");
 
-  const hash = async (p: string) => bcrypt.hash(p, 10);
+  const hash = async (p: string) => await hashPassword(p); // ← uses scrypt internally
 
   // 1. Admin user
   const adminEmail = "admin@foodhub.com";
@@ -21,8 +21,8 @@ async function main() {
       accounts: {
         create: {
           id: crypto.randomUUID(),
-          providerId: "credentials",
-          accountId: "admin-local",
+          providerId: "credential",
+          accountId: adminEmail, // ← fixed: use email
           password: await hash("SecureAdminPass123"),
         },
       },
@@ -140,8 +140,8 @@ async function main() {
         accounts: {
           create: {
             id: crypto.randomUUID(),
-            providerId: "credentials",
-            accountId: `${p.name.toLowerCase().replace(/\s+/g, "-")}-account`,
+            providerId: "credential",
+            accountId: p.email, // ← fixed: use email
             password: await hash("ProviderPass123"),
           },
         },
@@ -205,8 +205,8 @@ async function main() {
         accounts: {
           create: {
             id: crypto.randomUUID(),
-            providerId: "credentials",
-            accountId: `${c.name.toLowerCase().replace(/\s+/g, "-")}-account`,
+            providerId: "credential",
+            accountId: c.email, // ← fixed: use email
             password: await hash("CustomerPass123"),
           },
         },

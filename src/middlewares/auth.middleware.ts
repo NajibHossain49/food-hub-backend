@@ -20,6 +20,13 @@ export const requireAuth = async (
 
     req.user = session.user;
 
+    // debug logs (keep them for development purposes)
+    console.log("=== DEBUG: Authenticated user ===");
+    console.log("User ID: ", req.user.id);
+    console.log("Email: ", req.user.email);
+    console.log("Role: ", req.user.role);
+    console.log("Full user: ", JSON.stringify(req.user, null, 2));
+
     next();
   } catch (error) {
     console.error("Auth middleware error:", error);

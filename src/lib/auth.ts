@@ -11,4 +11,22 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+
+  // expose role + isActive)
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: true, // matches your schema (not nullable)
+        defaultValue: "CUSTOMER", // fallback if needed
+        input: false, // important: prevent users from sending role during signup
+      },
+      isActive: {
+        type: "boolean",
+        required: true,
+        defaultValue: true,
+        input: false,
+      },
+    },
+  },
 });
