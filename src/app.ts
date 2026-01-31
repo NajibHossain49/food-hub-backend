@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application } from "express";
 import config from "./config/env.config.js";
+import adminRoutes from "./modules/admin/admin.route.js";
 import homeRoutes from "./modules/home/home.route.js";
 import mealRoutes from "./modules/meal/meal.route.js";
 import orderRoutes from "./modules/order/order.route.js";
@@ -13,7 +14,6 @@ import userRoutes from "./modules/user/user.route.js";
 // Better Auth imports
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
-import { requireAuth } from "./middlewares/auth.middleware.js";
 
 // Load environment variables
 dotenv.config();
@@ -50,8 +50,11 @@ app.use("/api/orders", orderRoutes);
 // Review routes (Review Module) Public + protected review routes
 app.use("/api/reviews", reviewRoutes);
 
-// 3. My normal routes
-app.use("/api", requireAuth, homeRoutes);
+// Admin routes (Admin Module) Protected admin routes
+app.use("/api/admin", adminRoutes);
+
+// Home routes (Home Module) Public home routes
+app.use("/api/home", homeRoutes);
 
 // Health check test route
 app.get("/", (req, res) => {
