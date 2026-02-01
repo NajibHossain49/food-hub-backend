@@ -20,16 +20,18 @@ dotenv.config();
 
 const app: Application = express();
 
-// 1. Mount Better Auth FIRST using prefix style
-app.all("/api/auth/*splat", toNodeHandler(auth));
-
-// 2. Now add other middlewares (important order!)
+// 1. Now add other middlewares (important order!)
 app.use(
   cors({
     origin: config.CLIENT_URL,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
+// 2. Mount Better Auth FIRST using prefix style
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(cookieParser());
 app.use(express.json());
