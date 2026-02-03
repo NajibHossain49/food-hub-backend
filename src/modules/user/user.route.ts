@@ -5,12 +5,9 @@ import { validateUpdateUser } from "./user.validation.js";
 
 const router = express.Router();
 
-// Public routes (we can later move them under requireAuth)
-router.get("/", UserController.list);
-router.get("/:id", UserController.getById);
-
 // Protected routes (Better Auth required)
-router.get("/me", requireAuth, UserController.me);
+router.get("/", requireAuth, UserController.list);
+router.get("/:id", requireAuth, UserController.getById);
 router.put(
   "/me",
   requireAuth,

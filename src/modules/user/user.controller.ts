@@ -39,16 +39,6 @@ export class UserController {
     }
   }
 
-  static async me(req: Request, res: Response) {
-    try {
-      const user = await UserService.findById(req.user.id);
-      if (!user) return res.status(404).json({ message: "User not found" });
-      res.status(200).json(toPublic(user));
-    } catch {
-      res.status(500).json({ message: "Failed to fetch current user" });
-    }
-  }
-
   static async updateProfile(req: Request, res: Response) {
     try {
       const data = (({ name, phone, avatarUrl, image }) => ({
