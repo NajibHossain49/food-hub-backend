@@ -3,3 +3,4 @@ Commit on 2026-02-05 00:00:00: fix: resolve missing validation for delivery addr
 Commit on 2026-02-05 00:00:00: feat: add input sanitization middleware for all POST/PUT routes
 Commit on 2026-02-05 00:00:00: refactor: extract order status enum to shared constants file
 Commit on 2026-02-06 00:00:00: fix: prevent duplicate order creation on double click
+Commit on 2026-02-06 00:00:00: feat: implement order tracking endpoint with real-time status
