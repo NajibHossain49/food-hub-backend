@@ -2,3 +2,4 @@ Commit on 2026-02-05 00:00:00: fix: correct order status update not reflecting i
 Commit on 2026-02-05 00:00:00: fix: resolve missing validation for delivery address in checkout endpoint
 Commit on 2026-02-05 00:00:00: feat: add input sanitization middleware for all POST/PUT routes
 Commit on 2026-02-05 00:00:00: refactor: extract order status enum to shared constants file
+Commit on 2026-02-06 00:00:00: fix: prevent duplicate order creation on double click
