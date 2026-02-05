@@ -5,3 +5,4 @@ Commit on 2026-02-05 00:00:00: refactor: extract order status enum to shared con
 Commit on 2026-02-06 00:00:00: fix: prevent duplicate order creation on double click
 Commit on 2026-02-06 00:00:00: feat: implement order tracking endpoint with real-time status
 Commit on 2026-02-06 00:00:00: fix: correct meal availability check failing when stock is zero
+Commit on 2026-02-06 00:00:00: chore: add logging for failed payment simulation attempts
