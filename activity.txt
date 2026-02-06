@@ -7,3 +7,4 @@ Commit on 2026-02-06 00:00:00: feat: implement order tracking endpoint with real
 Commit on 2026-02-06 00:00:00: fix: correct meal availability check failing when stock is zero
 Commit on 2026-02-06 00:00:00: chore: add logging for failed payment simulation attempts
 Commit on 2026-02-07 00:00:00: feat: add admin endpoint to suspend/activate user accounts
+Commit on 2026-02-07 00:00:00: fix: resolve provider not seeing own orders in /provider/orders
