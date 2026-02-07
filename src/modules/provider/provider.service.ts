@@ -31,20 +31,54 @@ export class ProviderService {
   static async createMeal(providerId: string, data: MealInput) {
     return prisma.meal.create({
       data: {
-        ...data,
+        name: data.name,
+        description: data.description ?? null, // fix: undefined → null
+        price: data.price,
+        image: data.image ?? null, // fix: undefined → null
+        categoryId: data.categoryId,
         providerId,
       },
     });
   }
 
-  static async updateMeal(id: string, data: Partial<MealInput>) {
+  static async updateMeal(mealId: string, providerId: string, data: any) {
+    // First, verify the meal belongs to this provider
+    const meal = await prisma.meal.findFirst({
+      where: {
+        id: mealId,
+        providerId: providerId,
+      },
+    });
+
+    if (!meal) {
+      throw new Error("Meal not found or does not belong to this provider");
+    }
+
     return prisma.meal.update({
-      where: { id },
-      data,
+      where: { id: mealId },
+      data: {
+        name: data.name,
+        description: data.description ?? null,
+        price: data.price,
+        image: data.image ?? null,
+        categoryId: data.categoryId,
+        // isAvailable: data.isAvailable,  // uncomment if added to schema
+      },
     });
   }
 
-  static async deleteMeal(id: string) {
-    return prisma.meal.delete({ where: { id } });
+  static async deleteMeal(mealId: string, providerId: string) {
+    const deleted = await prisma.meal.deleteMany({
+      where: {
+        id: mealId,
+        providerId: providerId,
+      },
+    });
+
+    if (deleted.count === 0) {
+      throw new Error("Meal not found or does not belong to this provider");
+    }
+
+    return { deleted: true };
   }
 }

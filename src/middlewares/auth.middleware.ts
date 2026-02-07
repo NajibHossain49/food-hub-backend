@@ -4,7 +4,7 @@ import { auth as butterAuth } from "../lib/auth.js";
 export const requireAuth = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const session = await butterAuth.api.getSession({
@@ -18,14 +18,12 @@ export const requireAuth = async (
       });
     }
 
-    req.user = session.user;
-
-    // debug logs (keep them for development purposes)
-    console.log("=== DEBUG: Authenticated user ===");
-    console.log("User ID: ", req.user.id);
-    console.log("Email: ", req.user.email);
-    console.log("Role: ", req.user.role);
-    console.log("Full user: ", JSON.stringify(req.user, null, 2));
+    req.user = {
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+      role: session.user.role,
+    };
 
     next();
   } catch (error) {

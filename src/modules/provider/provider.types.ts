@@ -7,8 +7,8 @@ export interface ProviderProfileInput {
 
 export interface MealInput {
   name: string;
-  description?: string;
+  description?: string | null;
   price: number;
-  image?: string;
-  category?: string;
+  image?: string | null;
+  categoryId: string;
 }

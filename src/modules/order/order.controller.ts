@@ -26,15 +26,19 @@ function toPublic(order: any): OrderPublic {
 export class OrderController {
   static async create(req: Request, res: Response) {
     try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const order = await OrderService.createOrder(req.user.id, req.body);
       res.status(201).json(toPublic(order));
     } catch (err: any) {
-      res.status(400).json({ message: err.message || "Failed to create order" });
+      res
+        .status(400)
+        .json({ message: err.message || "Failed to create order" });
     }
   }
 
   static async list(req: Request, res: Response) {
     try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const orders = await OrderService.getOrdersByUser(req.user.id);
       res.status(200).json(orders.map(toPublic));
     } catch {
@@ -44,6 +48,9 @@ export class OrderController {
 
   static async getById(req: Request, res: Response) {
     try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      if (!req.params.id)
+        return res.status(400).json({ message: "Order ID is required" });
       const order = await OrderService.getOrderById(req.user.id, req.params.id);
       if (!order) return res.status(404).json({ message: "Order not found" });
       res.status(200).json(toPublic(order));

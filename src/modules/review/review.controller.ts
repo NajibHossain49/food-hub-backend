@@ -18,6 +18,10 @@ function toPublic(review: any): ReviewPublic {
 export class ReviewController {
   static async create(req: Request, res: Response) {
     try {
+      if (!req.user) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
       const review = await ReviewService.createReview(req.user.id, req.body);
       res.status(201).json(toPublic(review));
     } catch (err: any) {
@@ -29,6 +33,10 @@ export class ReviewController {
 
   static async listByMeal(req: Request, res: Response) {
     try {
+      if (!req.params.mealId) {
+        res.status(400).json({ message: "Meal ID is required" });
+        return;
+      }
       const reviews = await ReviewService.getReviewsByMeal(req.params.mealId);
       res.status(200).json(reviews.map(toPublic));
     } catch {
@@ -38,6 +46,10 @@ export class ReviewController {
 
   static async listByUser(req: Request, res: Response) {
     try {
+      if (!req.user) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
       const reviews = await ReviewService.getUserReviews(req.user.id);
       const formatted = reviews.map((r: any) => ({
         ...toPublic(r),
@@ -51,6 +63,14 @@ export class ReviewController {
 
   static async delete(req: Request, res: Response) {
     try {
+      if (!req.user) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+      if (!req.params.id) {
+        res.status(400).json({ message: "Review ID is required" });
+        return;
+      }
       await ReviewService.deleteReview(req.user.id, req.params.id);
       res.status(204).send();
     } catch (err: any) {

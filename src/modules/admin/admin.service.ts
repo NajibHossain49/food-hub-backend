@@ -25,6 +25,14 @@ export class AdminService {
     });
   }
 
+  // ADD THIS MISSING METHOD
+  static async updateUserRole(id: string, role: string) {
+    return prisma.user.update({
+      where: { id },
+      data: { role: role as "CUSTOMER" | "PROVIDER" | "ADMIN" },
+    });
+  }
+
   // Orders
   static async getAllOrders() {
     return prisma.order.findMany({

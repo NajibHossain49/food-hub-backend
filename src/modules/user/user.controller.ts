@@ -31,7 +31,9 @@ export class UserController {
 
   static async getById(req: Request, res: Response) {
     try {
-      const user = await UserService.findById(req.params.id);
+      const { id } = req.params;
+      if (!id) return res.status(400).json({ message: "id is required" });
+      const user = await UserService.findById(id);
       if (!user) return res.status(404).json({ message: "User not found" });
       res.status(200).json(toPublic(user));
     } catch {
@@ -41,6 +43,7 @@ export class UserController {
 
   static async updateProfile(req: Request, res: Response) {
     try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const data = (({ name, phone, avatarUrl, image }) => ({
         name,
         phone,
@@ -56,6 +59,7 @@ export class UserController {
 
   static async createProviderProfile(req: Request, res: Response) {
     try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const { name, description, address, phone } = req.body;
       if (!name) return res.status(400).json({ message: "name is required" });
       const profile = await UserService.createProviderProfile(req.user.id, {

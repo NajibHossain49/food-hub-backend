@@ -10,7 +10,7 @@ router.use(requireAuth);
 
 // Middleware to check admin role
 router.use((req, res, next) => {
-  if (req.user.role !== "ADMIN") {
+  if ((req.user as any).role !== "ADMIN") {
     return res.status(403).json({ message: "Access denied: Admins only" });
   }
   next();
@@ -23,11 +23,13 @@ router.patch(
   validateUserStatus,
   AdminController.updateUserStatus,
 );
+router.patch("/users/:id/role", AdminController.updateUserRole); // New route for role update
 
 // Order management
 router.get("/orders", AdminController.getOrders);
+router.patch("/orders/:id/status", AdminController.updateOrderStatus); // New route for order status
 
-// Category management
+// Categories management
 router.get("/categories", AdminController.getCategories);
 router.post("/categories", validateCategory, AdminController.createCategory);
 router.put("/categories/:id", validateCategory, AdminController.updateCategory);

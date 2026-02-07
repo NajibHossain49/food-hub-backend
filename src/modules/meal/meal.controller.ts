@@ -35,8 +35,15 @@ export class MealController {
   }
 
   static async getById(req: Request, res: Response) {
+    const { id } = req.params;
+
+    // Guard: check if id exists
+    if (!id) {
+      return res.status(400).json({ message: "Meal ID is required" });
+    }
+
     try {
-      const meal = await MealService.getMealById(req.params.id);
+      const meal = await MealService.getMealById(id);
       if (!meal) return res.status(404).json({ message: "Meal not found" });
       res.status(200).json(toPublic(meal));
     } catch (err) {

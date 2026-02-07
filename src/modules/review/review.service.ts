@@ -34,9 +34,9 @@ export class ReviewService {
     const review = await prisma.review.create({
       data: {
         mealId: data.mealId,
-        userId,
+        userId: userId,
         rating: data.rating,
-        comment: data.comment,
+        comment: data.comment ?? null, // Convert undefined → null
       },
       include: { user: true },
     });

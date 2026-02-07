@@ -29,9 +29,9 @@ export class UserService {
       data: {
         userId,
         name: payload.name,
-        description: payload.description,
-        address: payload.address,
-        phone: payload.phone,
+        description: payload.description ?? null, // Convert undefined → null
+        address: payload.address ?? null, // Convert undefined → null
+        phone: payload.phone ?? null, // Convert undefined → null
       },
     });
 

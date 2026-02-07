@@ -3,7 +3,16 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import config from "../config/env.config.js";
 import { prisma } from "./prisma.js";
 
-// Required: Better Auth instance
+// Define the expected shape of the user object in the event handler
+interface AuthUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  role: string;
+  isActive: boolean;
+  // Add other fields if needed
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -15,14 +24,23 @@ export const auth = betterAuth({
     enabled: true,
   },
 
-  // expose role + isActive)
+  events: {
+    onSignIn: async ({ user }: { user: AuthUser }) => {
+      if (!user.isActive) {
+        throw new Error("Account is inactive. Contact admin.");
+      }
+      // Optional: other sign-in logic
+    },
+  },
+
+  // expose role + isActive
   user: {
     additionalFields: {
       role: {
         type: "string",
-        required: true, // matches your schema (not nullable)
-        defaultValue: "CUSTOMER", // fallback if needed
-        input: false, // important: prevent users from sending role during signup
+        required: true,
+        defaultValue: "CUSTOMER",
+        input: false,
       },
       isActive: {
         type: "boolean",
@@ -34,7 +52,7 @@ export const auth = betterAuth({
   },
 });
 
-// Required: Helper to get current user with my custom fields
+// Required: Helper to get current user with custom fields
 export async function getCurrentUser() {
   const session = await auth.api.getSession();
 
