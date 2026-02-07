@@ -11,3 +11,4 @@ Commit on 2026-02-07 00:00:00: fix: resolve provider not seeing own orders in /p
 Commit on 2026-02-07 00:00:00: refactor: move role-based authorization to dedicated middleware
 Commit on 2026-02-07 00:00:00: fix: correct category delete endpoint not removing related meals
 Commit on 2026-02-08 00:00:00: fix: add missing error handling for database connection failures
+Commit on 2026-02-08 00:00:00: perf: optimize meal list query with proper indexing hints
