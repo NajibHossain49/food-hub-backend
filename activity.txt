@@ -13,3 +13,4 @@ Commit on 2026-02-07 00:00:00: fix: correct category delete endpoint not removin
 Commit on 2026-02-08 00:00:00: fix: add missing error handling for database connection failures
 Commit on 2026-02-08 00:00:00: perf: optimize meal list query with proper indexing hints
 Commit on 2026-02-08 00:00:00: chore: remove unused imports and console logs from controllers
+Commit on 2026-02-08 00:00:00: docs: update API documentation with latest endpoint changes
