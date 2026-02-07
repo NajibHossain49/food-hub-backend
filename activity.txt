@@ -10,3 +10,4 @@ Commit on 2026-02-07 00:00:00: feat: add admin endpoint to suspend/activate user
 Commit on 2026-02-07 00:00:00: fix: resolve provider not seeing own orders in /provider/orders
 Commit on 2026-02-07 00:00:00: refactor: move role-based authorization to dedicated middleware
 Commit on 2026-02-07 00:00:00: fix: correct category delete endpoint not removing related meals
+Commit on 2026-02-08 00:00:00: fix: add missing error handling for database connection failures
