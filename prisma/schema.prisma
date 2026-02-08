@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -13,37 +7,30 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  CUSTOMER
-  PROVIDER
-  ADMIN
-}
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  phone         String?            // new optional phone
-  role          Role     @default(CUSTOMER) // new role
-  avatarUrl     String?            // optional avatar URL (if you prefer separate from image)
-  isActive      Boolean  @default(true) // soft-delete / activation flag
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  providerProfile ProviderProfile?
-  providerProfileId String?          // nullable FK for provider profile
+  id                String           @id
+  name              String
+  email             String           @unique
+  emailVerified     Boolean          @default(false)
+  image             String?
+  phone             String?
+  role              Role             @default(CUSTOMER)
+  avatarUrl         String?
+  isActive          Boolean          @default(true)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  providerProfileId String?
+  orders            Order[]
+  providerProfile   ProviderProfile?
+  reviews           Review[]
+  accounts          Account[]
+  sessions          Session[]
 
-  @@unique([email])
   @@map("user")
-  orders Order[]
-  reviews Review[]
 }
 
 model ProviderProfile {
   id          String   @id @default(uuid())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String   @unique
   name        String
   description String?
@@ -51,96 +38,80 @@ model ProviderProfile {
   phone       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  meals Meal[]
-
-  orders Order[]
+  meals       Meal[]
+  orders      Order[]
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Category {
   id        String   @id @default(uuid())
   name      String   @unique
-  meals     Meal[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  meals     Meal[]
 }
 
 model Meal {
-  id          String    @id @default(uuid())
+  id          String          @id @default(uuid())
   name        String
   description String?
   price       Float
   image       String?
-  provider    ProviderProfile @relation(fields: [providerId], references: [id])
   providerId  String
-  categoryId  String? 
-  category    Category? @relation(fields: [categoryId], references: [id])
-  // isAvailable Boolean   @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  orderItems OrderItem[]
-
-  reviews Review[]
-}
-
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  PREPARING
-  OUT_FOR_DELIVERY
-  DELIVERED
-  CANCELLED
+  categoryId  String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  category    Category?       @relation(fields: [categoryId], references: [id])
+  provider    ProviderProfile @relation(fields: [providerId], references: [id])
+  orderItems  OrderItem[]
+  reviews     Review[]
 }
 
 model Order {
-  id          String       @id @default(uuid())
-  customer    User         @relation(fields: [customerId], references: [id])
-  customerId  String
-  provider    ProviderProfile @relation(fields: [providerId], references: [id])
-  providerId  String
-  status      OrderStatus  @default(PENDING)
-  totalAmount Float
+  id              String          @id @default(uuid())
+  customerId      String
+  providerId      String
+  status          OrderStatus     @default(PENDING)
+  totalAmount     Float
   deliveryAddress String
-  paymentMethod String      @default("Cash on Delivery")
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  items       OrderItem[]
+  paymentMethod   String          @default("Cash on Delivery")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  customer        User            @relation(fields: [customerId], references: [id])
+  provider        ProviderProfile @relation(fields: [providerId], references: [id])
+  items           OrderItem[]
 }
 
 model OrderItem {
-  id        String   @id @default(uuid())
-  meal      Meal     @relation(fields: [mealId], references: [id])
-  mealId    String
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId   String
-  quantity  Int      @default(1)
-  price     Float
-  subtotal  Float
+  id       String @id @default(uuid())
+  mealId   String
+  orderId  String
+  quantity Int    @default(1)
+  price    Float
+  subtotal Float
+  meal     Meal   @relation(fields: [mealId], references: [id])
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Review {
-  id         String   @id @default(uuid())
-  rating     Int
-  comment    String?
-  meal       Meal     @relation(fields: [mealId], references: [id])
-  mealId     String
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String?
+  mealId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  meal      Meal     @relation(fields: [mealId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([mealId])
   @@index([userId])
 }
 
-
-
-
 model Session {
   id        String   @id
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   ipAddress String?
@@ -148,7 +119,6 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@index([userId])
   @@map("session")
 }
@@ -158,7 +128,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -168,6 +137,7 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("account")
@@ -183,4 +153,19 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+enum Role {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
 }
