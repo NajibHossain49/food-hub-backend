@@ -19,3 +19,5 @@ coverage
 /.env.development.local
 
 /src/generated/prisma
+.vercel
+.env*.local
