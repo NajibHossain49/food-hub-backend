@@ -2,7 +2,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application } from "express";
-import config from "./config/env.config.js";
 import adminRoutes from "./modules/admin/admin.route.js";
 import homeRoutes from "./modules/home/home.route.js";
 import mealRoutes from "./modules/meal/meal.route.js";
@@ -20,45 +19,52 @@ dotenv.config();
 
 const app: Application = express();
 
-// 1. Now add other middlewares (important order!)
+// Configure allowed origins dynamically
+const allowedOrigins = [
+  process.env.CLIENT_URL || "http://localhost:3000",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
+// Configure CORS
 app.use(
   cors({
-    origin: config.CLIENT_URL,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) ||
+        /^https:\/\/.*\.vercel\.app$/.test(origin);
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["Set-Cookie"],
   }),
 );
 
-// 2. Mount Better Auth FIRST using prefix style
+// Mount BetterAuth first
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// User routes (User Module) Public + protected user routes
+// Routes
 app.use("/api/users", userRoutes);
-
-// Provider routes (Provider Module) Public + protected provider routes
 app.use("/api/provider", providerRoutes);
-
-// Meal routes (Meal Module) Public meal routes
 app.use("/api/meals", mealRoutes);
-
-// Order routes (Order Module) Protected order routes
 app.use("/api/orders", orderRoutes);
-
-// Review routes (Review Module) Public + protected review routes
 app.use("/api/reviews", reviewRoutes);
-
-// Admin routes (Admin Module) Protected admin routes
 app.use("/api/admin", adminRoutes);
-
-// Home routes (Home Module) Public home routes
 app.use("/api/home", homeRoutes);
 
-// Health check test route
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "OK",
@@ -67,7 +73,6 @@ app.get("/", (req, res) => {
   });
 });
 
-// 404 handler (must be last)
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });

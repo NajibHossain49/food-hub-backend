@@ -4,6 +4,13 @@ import cors from "cors";
 import dotenv2 from "dotenv";
 import express7 from "express";
 
+// src/modules/admin/admin.route.ts
+import express from "express";
+
+// src/lib/auth.ts
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+
 // src/config/env.config.ts
 import dotenv from "dotenv";
 dotenv.config();
@@ -15,13 +22,6 @@ var config = {
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || "http://localhost:4000"
 };
 var env_config_default = config;
-
-// src/modules/admin/admin.route.ts
-import express from "express";
-
-// src/lib/auth.ts
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
 
 // src/lib/prisma.ts
 import "dotenv/config";
@@ -102,6 +102,23 @@ var auth = betterAuth({
         throw new Error("Account is inactive. Contact admin.");
       }
     }
+  },
+  // Add these sections here (Step 2)
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60
+      // 5 minutes
+    }
+  },
+  advanced: {
+    cookiePrefix: "better-auth",
+    useSecureCookies: process.env.NODE_ENV === "production",
+    crossSubDomainCookies: {
+      enabled: false
+    },
+    disableCSRFCheck: true
+    // Allow requests without Origin header (Postman, mobile apps, etc.)
   },
   // expose role + isActive
   user: {
@@ -1257,12 +1274,25 @@ var user_route_default = router7;
 import { toNodeHandler } from "better-auth/node";
 dotenv2.config();
 var app = express7();
+var allowedOrigins = [
+  process.env.CLIENT_URL || "http://localhost:3000",
+  process.env.CLIENT_URL
+].filter(Boolean);
 app.use(
   cors({
-    origin: env_config_default.CLIENT_URL,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const isAllowed = allowedOrigins.includes(origin) || /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin);
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["Set-Cookie"]
   })
 );
 app.all("/api/auth/*splat", toNodeHandler(auth));
@@ -1289,21 +1319,7 @@ app.use((req, res) => {
 var app_default = app;
 
 // src/server.ts
-async function main() {
-  try {
-    await prisma.$connect();
-    console.log("Database connected successfully");
-    app_default.listen(env_config_default.PORT, () => {
-      console.log(`Server is running on http://localhost:${env_config_default.PORT}`);
-      console.log(`Environment: ${env_config_default.NODE_ENV}`);
-    });
-  } catch (error) {
-    console.error("Failed to connect to the database", error);
-    process.exit(1);
-  } finally {
-    process.on("beforeExit", async () => {
-      await prisma.$disconnect();
-    });
-  }
-}
-main();
+var server_default = app_default;
+export {
+  server_default as default
+};
